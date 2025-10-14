@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeCanvas — AI-Powered Code Executor</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎨 CodeCanvas</h1>
+      <p>Генерируй и запускай код в браузере: графики, таблицы, HTML-приложения</p>
+    </header>
+
+    <div class="input-section">
+      <textarea id="prompt" placeholder="Например: Построй график sin(x) и cos(x)"></textarea>
+      <div class="examples">
+        <span>💡 Примеры:</span>
+        <button class="example-btn" data-example="Построй график y = x² от -5 до 5">График</button>
+        <button class="example-btn" data-example="Создай HTML-таблицу с данными: Имя, Возраст, Город">Таблица</button>
+        <button class="example-btn" data-example="Сделай калькулятор площади круга">Калькулятор</button>
+      </div>
+      <div class="controls">
+        <button id="run-btn" class="primary-btn">
+          <span class="btn-text">Сгенерировать и выполнить</span>
+          <span class="btn-loading" style="display:none">⏳ Генерация...</span>
+        </button>
+        <button id="clear-btn" class="secondary-btn">Очистить</button>
+      </div>
+    </div>
+
+    <div class="output-section">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="result">Результат</button>
+        <button class="tab-btn" data-tab="code">Код</button>
+        <button class="tab-btn" data-tab="console">Консоль</button>
+      </div>
+      <div class="tab-content">
+        <div id="result-tab" class="tab-pane active">
+          <div id="output" class="output-container">
+            <div class="placeholder">
+              <div class="placeholder-icon">🚀</div>
+              <p>Введите запрос и нажмите кнопку выше</p>
+            </div>
+          </div>
+        </div>
+        <div id="code-tab" class="tab-pane">
+          <pre id="generated-code" class="code-block"></pre>
+        </div>
+        <div id="console-tab" class="tab-pane">
+          <pre id="console-output" class="console-block"></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div id="status" class="status">Готов к работе</div>
+      <div id="execution-time" class="execution-time"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
