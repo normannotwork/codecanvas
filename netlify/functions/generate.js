@@ -40,6 +40,9 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Задержка для избежания rate limiting
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     const MODEL = 'deepseek/deepseek-r1-0528:free';
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -65,13 +68,12 @@ exports.handler = async (event, context) => {
 3. Для HTML: возвращай полный валидный HTML-фрагмент (без <!DOCTYPE>, если не требуется).
 4. Никогда не используй: os, sys, subprocess, open, файлы, сеть.
 5. Код должен быть готов к немедленному выполнению в изолированной среде.
-6. Если запрос неясен — сделай разумное предположение и верни рабочий код.
-7. Будь точным и следуй инструкциям строго.`
+6. Если запрос неясен — сделай разумное предположение и верни рабочий код.`
           },
           { role: 'user', content: prompt },
         ],
-        temperature: 0.3, // Немного выше для R1 модели
-        max_tokens: 2000, // Увеличил лимит для reasoning модели
+        temperature: 0.3,
+        max_tokens: 2000,
         top_p: 0.9,
         frequency_penalty: 0.2,
         presence_penalty: 0.1
@@ -79,6 +81,16 @@ exports.handler = async (event, context) => {
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        return {
+          statusCode: 429,
+          headers,
+          body: JSON.stringify({ 
+            error: 'Слишком много запросов. Пожалуйста, подождите 1-2 минуты перед следующим запросом.' 
+          })
+        };
+      }
+      
       const errData = await response.json().catch(() => ({}));
       console.error('OpenRouter API error:', {
         status: response.status,
@@ -95,26 +107,11 @@ exports.handler = async (event, context) => {
     const data = await response.json();
     let code = data.choices[0]?.message?.content?.trim() || '';
 
-    // Улучшенная очистка для reasoning модели (может добавлять размышления)
+    // Очистка кода
     code = code
       .replace(/^```[a-z]*\s*\n?/i, '')
       .replace(/\n?```$/i, '')
-      .replace(/^(рассуждение|reasoning):.*?\n/gi, '') // Удаляем reasoning префиксы
-      .replace(/^(рассуждение|reasoning):/gi, '')
       .trim();
-
-    // Если код содержит reasoning блоки, берем только последний код
-    const codeBlocks = code.split(/```/);
-    if (codeBlocks.length > 1) {
-      // Берем последний код блок
-      for (let i = codeBlocks.length - 1; i >= 0; i--) {
-        const block = codeBlocks[i].trim();
-        if (block && !block.match(/^(рассуждение|reasoning)/i)) {
-          code = block.replace(/^[a-z]+\n?/i, '').trim();
-          break;
-        }
-      }
-    }
 
     return {
       statusCode: 200,
