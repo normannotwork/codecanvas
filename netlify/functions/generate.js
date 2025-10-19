@@ -40,13 +40,13 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const MODEL = 'deepseek/deepseek-chat-v3.1:free'; // или 'anthropic/claude-3.5-sonnet'
+    const MODEL = 'deepseek/deepseek-r1-0528:free';
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://codesimulate.netlify.app', // ← ОБЯЗАТЕЛЬНО замените!
+        'HTTP-Referer': 'https://codesimulate.netlify.app',
         'X-Title': 'AI Code Runner',
         'Content-Type': 'application/json',
       },
@@ -65,15 +65,16 @@ exports.handler = async (event, context) => {
 3. Для HTML: возвращай полный валидный HTML-фрагмент (без <!DOCTYPE>, если не требуется).
 4. Никогда не используй: os, sys, subprocess, open, файлы, сеть.
 5. Код должен быть готов к немедленному выполнению в изолированной среде.
-6. Если запрос неясен — сделай разумное предположение и верни рабочий код.`
+6. Если запрос неясен — сделай разумное предположение и верни рабочий код.
+7. Будь точным и следуй инструкциям строго.`
           },
           { role: 'user', content: prompt },
         ],
-        temperature: 0.2,
-        max_tokens: 1000,
-        top_p: 0.95,
-        frequency_penalty: 0.3,
-        presence_penalty: 0.2
+        temperature: 0.3, // Немного выше для R1 модели
+        max_tokens: 2000, // Увеличил лимит для reasoning модели
+        top_p: 0.9,
+        frequency_penalty: 0.2,
+        presence_penalty: 0.1
       }),
     });
 
@@ -94,11 +95,26 @@ exports.handler = async (event, context) => {
     const data = await response.json();
     let code = data.choices[0]?.message?.content?.trim() || '';
 
-    // Надёжная очистка от markdown
+    // Улучшенная очистка для reasoning модели (может добавлять размышления)
     code = code
       .replace(/^```[a-z]*\s*\n?/i, '')
       .replace(/\n?```$/i, '')
+      .replace(/^(рассуждение|reasoning):.*?\n/gi, '') // Удаляем reasoning префиксы
+      .replace(/^(рассуждение|reasoning):/gi, '')
       .trim();
+
+    // Если код содержит reasoning блоки, берем только последний код
+    const codeBlocks = code.split(/```/);
+    if (codeBlocks.length > 1) {
+      // Берем последний код блок
+      for (let i = codeBlocks.length - 1; i >= 0; i--) {
+        const block = codeBlocks[i].trim();
+        if (block && !block.match(/^(рассуждение|reasoning)/i)) {
+          code = block.replace(/^[a-z]+\n?/i, '').trim();
+          break;
+        }
+      }
+    }
 
     return {
       statusCode: 200,
