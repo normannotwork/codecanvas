@@ -86,7 +86,6 @@ def derivative_function(func, var='x', order=1):
   async executeCode(code) {
     if (!this.pyodide) throw new Error('Pyodide не инициализирован');
     this.log('Выполнение кода...', 'info');
-    this.pyodide.runPython('stdout_redirect.content = ""');
 
     try {
       // Check if it's HTML first
@@ -95,6 +94,24 @@ def derivative_function(func, var='x', order=1):
         return { type: 'html', content: code };
       } else {
         this.log('Выполнение Python кода...', 'info');
+
+        // Ensure stdout_redirect is available and reset it
+        this.pyodide.runPython(`
+if 'stdout_redirect' not in globals():
+    import sys
+    class StdoutRedirect:
+        def __init__(self):
+            self.content = ""
+        def write(self, text):
+            self.content += text
+        def flush(self):
+            pass
+    stdout_redirect = StdoutRedirect()
+    sys.stdout = stdout_redirect
+else:
+    stdout_redirect.content = ""
+`);
+
         const result = await this.pyodide.runPythonAsync(code);
         const stdout = this.pyodide.globals.get('stdout_redirect').content;
 
