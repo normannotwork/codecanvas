@@ -14,6 +14,7 @@ export class CodeExecutor {
     await this.pyodide.loadPackage('pandas');
     await this.pyodide.loadPackage('scipy');
     await this.pyodide.loadPackage('sympy');
+    await this.pyodide.loadPackage('jinja2');
 
    this.pyodide.runPython(`
 import matplotlib
