@@ -119,8 +119,23 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const data = await response.json();
-    
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      console.error('JSON parsing error:', jsonError);
+      const textResponse = await response.text();
+      console.error('Response text:', textResponse.substring(0, 500));
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          error: 'Неверный формат ответа от API',
+          details: 'Ответ не является валидным JSON'
+        }),
+      };
+    }
+
     // Проверяем структуру ответа IO Intelligence API
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       console.error('Invalid response structure:', data);
