@@ -44,7 +44,7 @@ exports.handler = async (event, context) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Используем модель из документации IO Intelligence
-    const MODEL = 'gpt-oss-120b';
+    const MODEL = 'openai/gpt-oss-120b';
 
     const response = await fetch('https://api.intelligence.io.solutions/api/v1/chat/completions', {
       method: 'POST',
