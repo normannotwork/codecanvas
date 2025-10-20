@@ -31,26 +31,24 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-    if (!OPENROUTER_API_KEY) {
+    const IOINTELLIGENCE_API_KEY = process.env.IOINTELLIGENCE_API_KEY;
+    if (!IOINTELLIGENCE_API_KEY) {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'Сервер не настроен: отсутствует OPENROUTER_API_KEY' }),
+        body: JSON.stringify({ error: 'Сервер не настроен: отсутствует IOINTELLIGENCE_API_KEY' }),
       };
     }
 
     // Задержка для избежания rate limiting
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const MODEL = 'deepseek/deepseek-r1-0528:free';
+    const MODEL = 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B';
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://api.intelligence.io.solutions/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://codesimulate.netlify.app',
-        'X-Title': 'AI Code Runner',
+        'Authorization': `Bearer ${IOINTELLIGENCE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -76,7 +74,8 @@ exports.handler = async (event, context) => {
         max_tokens: 2000,
         top_p: 0.9,
         frequency_penalty: 0.2,
-        presence_penalty: 0.1
+        presence_penalty: 0.1,
+        stream: false
       }),
     });
 
@@ -92,7 +91,7 @@ exports.handler = async (event, context) => {
       }
       
       const errData = await response.json().catch(() => ({}));
-      console.error('OpenRouter API error:', {
+      console.error('Intelligence.IO API error:', {
         status: response.status,
         body: errData
       });
@@ -100,7 +99,7 @@ exports.handler = async (event, context) => {
       return {
         statusCode: response.status,
         headers,
-        body: JSON.stringify({ error: `OpenRouter: ${errorMsg}` })
+        body: JSON.stringify({ error: `Intelligence.IO: ${errorMsg}` })
       };
     }
 
