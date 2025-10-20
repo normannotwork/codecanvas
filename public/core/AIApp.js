@@ -67,9 +67,15 @@ export class AIApp {
       const execTime = (performance.now() - start).toFixed(1);
       document.getElementById('execution-time').textContent = `⏱️ ${execTime} мс`;
 
-      Renderer.render(document.getElementById('output'), result);
-      this.updateStatus('Готово!', 'success');
+      // Enhanced result handling
+      if (result && result.type) {
+        Renderer.render(document.getElementById('output'), result);
+        this.updateStatus('Готово!', 'success');
+      } else {
+        throw new Error('Неверный формат результата выполнения');
+      }
     } catch (error) {
+      console.error('Execution error:', error);
       this.updateStatus(`Ошибка: ${error.message}`, 'error');
       Renderer.renderError(document.getElementById('output'), error.message);
     } finally {
