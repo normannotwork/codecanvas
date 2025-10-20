@@ -28,8 +28,18 @@ export class Renderer {
     const wrapper = document.createElement('div');
     wrapper.className = 'plot-wrapper';
 
+    // Create a blob URL for the image to avoid 414 errors
+    const byteCharacters = atob(dataUrl.split(',')[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'image/png' });
+    const blobUrl = URL.createObjectURL(blob);
+
     const img = document.createElement('img');
-    img.src = dataUrl;
+    img.src = blobUrl;
     img.className = 'rendered-plot';
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
@@ -58,12 +68,25 @@ export class Renderer {
     downloadBtn.textContent = '💾 Скачать PNG';
     downloadBtn.onclick = () => {
       try {
+        // Use blob URL for download to avoid 414 errors
+        const byteCharacters = atob(dataUrl.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/png' });
+        const blobUrl = URL.createObjectURL(blob);
+
         const a = document.createElement('a');
-        a.href = dataUrl;
+        a.href = blobUrl;
         a.download = `codecanvas-plot-${Date.now()}.png`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+        // Clean up blob URL
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
       } catch (error) {
         console.error('Download failed:', error);
         alert('Ошибка при скачивании файла');
@@ -75,24 +98,40 @@ export class Renderer {
     copyBtn.textContent = '📋 Копировать';
     copyBtn.onclick = async () => {
       try {
-        await navigator.clipboard.writeText(dataUrl);
+        // Copy blob URL instead of data URL to avoid length issues
+        const byteCharacters = atob(dataUrl.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/png' });
+        const blobUrl = URL.createObjectURL(blob);
+
+        await navigator.clipboard.writeText(blobUrl);
         copyBtn.textContent = '✅ Скопировано!';
         setTimeout(() => {
           copyBtn.textContent = '📋 Копировать';
+          URL.revokeObjectURL(blobUrl); // Clean up
         }, 2000);
       } catch (error) {
         console.error('Copy failed:', error);
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = dataUrl;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        copyBtn.textContent = '✅ Скопировано!';
-        setTimeout(() => {
-          copyBtn.textContent = '📋 Копировать';
-        }, 2000);
+        // Fallback for older browsers or when clipboard API fails
+        try {
+          const textArea = document.createElement('textarea');
+          textArea.value = dataUrl;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          copyBtn.textContent = '✅ Скопировано!';
+          setTimeout(() => {
+            copyBtn.textContent = '📋 Копировать';
+          }, 2000);
+        } catch (fallbackError) {
+          console.error('Fallback copy failed:', fallbackError);
+          alert('Не удалось скопировать изображение');
+        }
       }
     };
 
