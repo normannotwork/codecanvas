@@ -43,7 +43,8 @@ exports.handler = async (event, context) => {
     // Задержка для избежания rate limiting
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const MODEL = 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B';
+    // Используем модель из документации IO Intelligence
+    const MODEL = 'meta-llama/Llama-3.3-70B-Instruct';
 
     const response = await fetch('https://api.intelligence.io.solutions/api/v1/chat/completions', {
       method: 'POST',
@@ -72,14 +73,20 @@ exports.handler = async (event, context) => {
         ],
         temperature: 0.3,
         max_tokens: 2000,
-        top_p: 0.9,
-        frequency_penalty: 0.2,
-        presence_penalty: 0.1,
         stream: false
+        // Убраны параметры, которые могут не поддерживаться: top_p, frequency_penalty, presence_penalty
       }),
     });
 
     if (!response.ok) {
+      // Получаем детальную информацию об ошибке
+      let errorText = await response.text();
+      console.error('IO Intelligence API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
+
       if (response.status === 429) {
         return {
           statusCode: 429,
@@ -89,22 +96,38 @@ exports.handler = async (event, context) => {
           })
         };
       }
-      
-      const errData = await response.json().catch(() => ({}));
-      console.error('Intelligence.IO API error:', {
-        status: response.status,
-        body: errData
-      });
-      const errorMsg = errData?.error?.message || 'Неизвестная ошибка';
+
+      // Пытаемся распарсить ошибку как JSON, если не получается - используем текст
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { error: errorText };
+      }
+
       return {
         statusCode: response.status,
         headers,
-        body: JSON.stringify({ error: `Intelligence.IO: ${errorMsg}` })
+        body: JSON.stringify({ 
+          error: `IO Intelligence API: ${response.status} ${response.statusText}`,
+          details: errorData
+        })
       };
     }
 
     const data = await response.json();
-    let code = data.choices[0]?.message?.content?.trim() || '';
+    
+    // Проверяем структуру ответа IO Intelligence API
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid response structure:', data);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'Неверная структура ответа от API' }),
+      };
+    }
+
+    let code = data.choices[0].message.content?.trim() || '';
 
     // Очистка кода
     code = code
@@ -122,7 +145,10 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Внутренняя ошибка сервера' }),
+      body: JSON.stringify({ 
+        error: 'Внутренняя ошибка сервера',
+        details: error.message 
+      }),
     };
   }
 };
