@@ -262,7 +262,7 @@ globals()['plot_with_style'] = plot_with_style
 globals()['apply_professional_style'] = apply_professional_style
 globals()['create_color_palette'] = create_color_palette
 `);
-
+}
   log(msg, type = 'log') {
     this.consoleOutput.push({ msg, type });
     const el = document.getElementById('console-output');
