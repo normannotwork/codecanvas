@@ -44,7 +44,7 @@ exports.handler = async (event, context) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Используем модель из документации IO Intelligence
-    const MODEL = 'Qwen/Qwen3-235B-A22B-Thinking-2507';
+    const MODEL = 'Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8';
 
     const response = await fetch('https://api.intelligence.io.solutions/api/v1/chat/completions', {
       method: 'POST',
@@ -61,18 +61,17 @@ exports.handler = async (event, context) => {
 Правила:
 1. Отвечай ТОЛЬКО кодом. Никаких пояснений, комментариев, markdown, \`\`\`.
 2. Для Python:
-  - ВСЕГДА импортируй необходимые модули в начале: import matplotlib.pyplot as plt, import numpy as np, import pandas as pd
-  - Используй matplotlib для графиков с plt.plot(), plt.show() НЕ НУЖЕН - используй show_plot()
-  - В конце графика ОБЯЗАТЕЛЬНО вызывай show_plot() без параметров - это вернет base64 изображение
-  - Для таблиц: используй df_to_html(df) для pandas DataFrame - это вернет HTML
-  - Для данных: используй numpy массивы и pandas DataFrame
-  - Для математических вычислений: numpy, scipy, sympy уже доступны
-  - Примеры: solve_equation('x**2 - 4 = 0'), integrate_function('x**2', 'x', 0, 1'), derivative_function('x**2', 'x')
-3. Для HTML: возвращай полный валидный HTML-документ с <!DOCTYPE html> или HTML-фрагмент.
-4. Никогда не используй: os, sys, subprocess, open, файлы, сеть, прямой доступ к stdout_redirect, plt.show()
-5. Код должен быть готов к немедленному выполнению - все импорты в начале.
-6. Если запрос неясен — сделай разумное предположение и верни рабочий код.
-7. Для графиков: всегда импортируй matplotlib.pyplot as plt в начале, строй график, вызывай show_plot() в конце.`
+  - НЕ ИМПОРТИРУЙ НИЧЕГО - все модули уже доступны (matplotlib.pyplot as plt, numpy as np, pandas as pd)
+  - Для графиков: строй график с plt.plot(), plt.figure() и т.д., в конце ОБЯЗАТЕЛЬНО вызови show_plot()
+  - Для таблиц: создай pandas DataFrame и вызови df_to_html(df)
+  - Для данных: используй np.linspace(), np.array(), pd.DataFrame()
+  - Математические функции: solve_equation(), integrate_function(), derivative_function()
+  - НЕ используй plt.show(), print() для вывода графиков
+3. Для HTML: возвращай полный HTML-документ с <!DOCTYPE html> или HTML-фрагмент.
+4. Запрещено: os, sys, subprocess, open, файлы, сеть, stdout_redirect, plt.show(), print() для графиков
+5. Код должен выполняться сразу - без дополнительных импортов.
+6. Если запрос неясен — верни рабочий код с разумными предположениями.
+7. Графики: plt.figure(), plt.plot(), plt.title(), plt.grid() и ОБЯЗАТЕЛЬНО show_plot() в конце.`
           },
           { role: 'user', content: prompt },
         ],
