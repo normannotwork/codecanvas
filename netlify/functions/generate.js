@@ -44,7 +44,7 @@ exports.handler = async (event, context) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Используем модель из документации IO Intelligence
-    const MODEL = 'Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8';
+    const MODEL = 'Qwen/Qwen3-235B-A22B-Thinking-2507';
 
     const response = await fetch('https://api.intelligence.io.solutions/api/v1/chat/completions', {
       method: 'POST',
