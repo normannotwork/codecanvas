@@ -44,7 +44,7 @@ exports.handler = async (event, context) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Используем модель из документации IO Intelligence
-    const MODEL = 'meta-llama/Llama-3.3-70B-Instruct';
+    const MODEL = 'Qwen/Qwen3-235B-A22B-Thinking-2507';
 
     const response = await fetch('https://api.intelligence.io.solutions/api/v1/chat/completions', {
       method: 'POST',
@@ -61,18 +61,18 @@ exports.handler = async (event, context) => {
 Правила:
 1. Отвечай ТОЛЬКО кодом. Никаких пояснений, комментариев, markdown, \`\`\`.
 2. Для Python:
-  - Используй matplotlib для графиков с plt.figure(), plt.plot() и т.д.
-  - В конце графика ОБЯЗАТЕЛЬНО вызывай show_plot() без параметров.
-  - Для таблиц: используй df_to_html(df) для pandas DataFrame.
-  - Для математических вычислений: используй numpy, scipy, sympy.
-  - Для решения уравнений: solve_equation('x**2 - 4 = 0')
-  - Для интегралов: integrate_function('x**2', 'x', 0, 1)
-  - Для производных: derivative_function('x**2', 'x')
+  - ВСЕГДА импортируй необходимые модули в начале: import matplotlib.pyplot as plt, import numpy as np, import pandas as pd
+  - Используй matplotlib для графиков с plt.plot(), plt.show() НЕ НУЖЕН - используй show_plot()
+  - В конце графика ОБЯЗАТЕЛЬНО вызывай show_plot() без параметров - это вернет base64 изображение
+  - Для таблиц: используй df_to_html(df) для pandas DataFrame - это вернет HTML
+  - Для данных: используй numpy массивы и pandas DataFrame
+  - Для математических вычислений: numpy, scipy, sympy уже доступны
+  - Примеры: solve_equation('x**2 - 4 = 0'), integrate_function('x**2', 'x', 0, 1'), derivative_function('x**2', 'x')
 3. Для HTML: возвращай полный валидный HTML-документ с <!DOCTYPE html> или HTML-фрагмент.
-4. Никогда не используй: os, sys, subprocess, open, файлы, сеть, прямой доступ к stdout_redirect.
-5. Код должен быть готов к немедленному выполнению в изолированной среде.
+4. Никогда не используй: os, sys, subprocess, open, файлы, сеть, прямой доступ к stdout_redirect, plt.show()
+5. Код должен быть готов к немедленному выполнению - все импорты в начале.
 6. Если запрос неясен — сделай разумное предположение и верни рабочий код.
-7. Для графиков: всегда импортируй matplotlib.pyplot as plt в начале кода.`
+7. Для графиков: всегда импортируй matplotlib.pyplot as plt в начале, строй график, вызывай show_plot() в конце.`
           },
           { role: 'user', content: prompt },
         ],
