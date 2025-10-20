@@ -14,7 +14,6 @@ export class CodeExecutor {
     await this.pyodide.loadPackage('pandas');
     await this.pyodide.loadPackage('scipy');
     await this.pyodide.loadPackage('sympy');
-    await this.pyodide.loadPackage('seaborn');
 
    this.pyodide.runPython(`
 import matplotlib
@@ -28,10 +27,11 @@ import io, base64, sys, json
 from matplotlib import rcParams
 import matplotlib.gridspec as gridspec
 from matplotlib.patches import FancyBboxPatch, Circle, Rectangle
-import seaborn as sns
+# import seaborn as sns  # Seaborn not available in Pyodide
 
 # Настройка стилей для профессиональных графиков
-plt.style.use('seaborn-v0_8-whitegrid')
+# plt.style.use('seaborn-v0_8-whitegrid')  # Seaborn style not available
+plt.style.use('default')
 rcParams.update({
     'font.family': 'serif',
     'font.serif': ['Times New Roman', 'DejaVu Serif'],
@@ -63,7 +63,7 @@ globals()['np'] = np
 globals()['pd'] = pd
 globals()['scipy'] = scipy
 globals()['sympy'] = sympy
-globals()['sns'] = sns
+# globals()['sns'] = sns  # Seaborn not available
 
 class StdoutRedirect:
     def __init__(self):
@@ -102,10 +102,13 @@ def apply_professional_style():
 def create_color_palette(n_colors=8, palette_name='viridis'):
     """Создает красивую цветовую палитру"""
     if palette_name == 'professional':
-        colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', 
+        colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D',
                  '#3B1C32', '#6B8E23', '#4A6572', '#8B635C']
     else:
-        colors = sns.color_palette(palette_name, n_colors)
+        # Fallback to matplotlib colormaps since seaborn is not available
+        import matplotlib.cm as cm
+        cmap = cm.get_cmap(palette_name)
+        colors = [cmap(i / n_colors) for i in range(n_colors)]
     return colors
 
 def show_plot(style='professional', dpi=300, transparent_bg=False, 
