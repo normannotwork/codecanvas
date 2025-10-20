@@ -57,10 +57,43 @@ export class Renderer {
     downloadBtn.className = 'download-btn';
     downloadBtn.textContent = '💾 Скачать PNG';
     downloadBtn.onclick = () => {
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = `codecanvas-plot-${Date.now()}.png`;
-      a.click();
+      try {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `codecanvas-plot-${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('Download failed:', error);
+        alert('Ошибка при скачивании файла');
+      }
+    };
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'download-btn';
+    copyBtn.textContent = '📋 Копировать';
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(dataUrl);
+        copyBtn.textContent = '✅ Скопировано!';
+        setTimeout(() => {
+          copyBtn.textContent = '📋 Копировать';
+        }, 2000);
+      } catch (error) {
+        console.error('Copy failed:', error);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = dataUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        copyBtn.textContent = '✅ Скопировано!';
+        setTimeout(() => {
+          copyBtn.textContent = '📋 Копировать';
+        }, 2000);
+      }
     };
 
     const newTabBtn = document.createElement('button');
@@ -71,6 +104,7 @@ export class Renderer {
     };
 
     controls.appendChild(downloadBtn);
+    controls.appendChild(copyBtn);
     controls.appendChild(newTabBtn);
     wrapper.appendChild(controls);
     container.appendChild(wrapper);

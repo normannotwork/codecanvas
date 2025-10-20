@@ -33,11 +33,11 @@ export class AIApp {
 
   async initializeApp() {
     try {
-      this.updateStatus('Инициализация Python среды...', 'loading');
+      this.updateStatus('🔧 Инициализация Python среды...', 'loading');
       await this.codeExecutor.initialize();
-      this.updateStatus('Готов к работе ✨', 'success');
+      this.updateStatus('✨ Готов к работе!', 'success');
     } catch (error) {
-      this.updateStatus(`Ошибка: ${error.message}`, 'error');
+      this.updateStatus(`❌ Ошибка инициализации: ${error.message}`, 'error');
     }
   }
 
@@ -54,7 +54,7 @@ export class AIApp {
       if (btnText) btnText.style.display = 'none';
       if (btnLoading) btnLoading.style.display = 'inline';
 
-      this.updateStatus('Генерация кода...', 'loading');
+      this.updateStatus('🧠 Генерация кода...', 'loading');
       this.clearOutput();
       this.clearConsole();
 
@@ -62,7 +62,7 @@ export class AIApp {
       const code = await this.generateCode(prompt);
       document.getElementById('generated-code').textContent = code;
 
-      this.updateStatus('Выполнение кода...', 'loading');
+      this.updateStatus('⚡ Выполнение кода...', 'loading');
       const result = await this.codeExecutor.executeCode(code);
       const execTime = (performance.now() - start).toFixed(1);
       document.getElementById('execution-time').textContent = `⏱️ ${execTime} мс`;
@@ -70,13 +70,13 @@ export class AIApp {
       // Enhanced result handling
       if (result && result.type) {
         Renderer.render(document.getElementById('output'), result);
-        this.updateStatus('Готово!', 'success');
+        this.updateStatus('🎉 Готово!', 'success');
       } else {
         throw new Error('Неверный формат результата выполнения');
       }
     } catch (error) {
       console.error('Execution error:', error);
-      this.updateStatus(`Ошибка: ${error.message}`, 'error');
+      this.updateStatus(`❌ Ошибка: ${error.message}`, 'error');
       Renderer.renderError(document.getElementById('output'), error.message);
     } finally {
       if (runBtn) runBtn.disabled = false;
@@ -115,7 +115,7 @@ export class AIApp {
     this.clearConsole();
     document.getElementById('generated-code').textContent = '';
     document.getElementById('execution-time').textContent = '';
-    this.updateStatus('Готов к работе', 'info');
+    this.updateStatus('🧹 Очищено - готов к работе', 'info');
     this.switchTab('result');
   }
 

@@ -84,7 +84,9 @@ globals()['derivative_function'] = derivative_function
     this.consoleOutput.push({ msg, type });
     const el = document.getElementById('console-output');
     if (el) {
-      el.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+      const timestamp = new Date().toLocaleTimeString();
+      const emoji = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'info' ? 'ℹ️' : '📝';
+      el.textContent += `${emoji} [${timestamp}] ${msg}\n`;
       el.scrollTop = el.scrollHeight;
     }
   }

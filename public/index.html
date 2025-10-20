@@ -18,24 +18,26 @@
       <textarea id="prompt" placeholder="Например: Построй график sin(x) и cos(x)"></textarea>
       <div class="examples">
         <span>💡 Примеры:</span>
-        <button class="example-btn" data-example="Построй график y = x² от -5 до 5">График</button>
-        <button class="example-btn" data-example="Создай HTML-таблицу с данными: Имя, Возраст, Город">Таблица</button>
-        <button class="example-btn" data-example="Сделай калькулятор площади круга">Калькулятор</button>
+        <button class="example-btn" data-example="Построй график y = x² от -5 до 5">📊 График</button>
+        <button class="example-btn" data-example="Создай HTML-таблицу с данными: Имя, Возраст, Город">📋 Таблица</button>
+        <button class="example-btn" data-example="Сделай калькулятор площади круга">🧮 Калькулятор</button>
+        <button class="example-btn" data-example="Реши уравнение x² - 4 = 0">🔢 Математика</button>
+        <button class="example-btn" data-example="Создай интерактивную HTML-страницу с кнопками">🎨 HTML App</button>
       </div>
       <div class="controls">
         <button id="run-btn" class="primary-btn">
-          <span class="btn-text">Сгенерировать и выполнить</span>
+          <span class="btn-text">🚀 Сгенерировать и выполнить</span>
           <span class="btn-loading" style="display:none">⏳ Генерация...</span>
         </button>
-        <button id="clear-btn" class="secondary-btn">Очистить</button>
+        <button id="clear-btn" class="secondary-btn">🗑️ Очистить</button>
       </div>
     </div>
 
     <div class="output-section">
       <div class="tabs">
-        <button class="tab-btn active" data-tab="result">Результат</button>
-        <button class="tab-btn" data-tab="code">Код</button>
-        <button class="tab-btn" data-tab="console">Консоль</button>
+        <button class="tab-btn active" data-tab="result">🎯 Результат</button>
+        <button class="tab-btn" data-tab="code">💻 Код</button>
+        <button class="tab-btn" data-tab="console">📝 Консоль</button>
       </div>
       <div class="tab-content">
         <div id="result-tab" class="tab-pane active">
@@ -43,6 +45,7 @@
             <div class="placeholder">
               <div class="placeholder-icon">🚀</div>
               <p>Введите запрос и нажмите кнопку выше</p>
+              <p style="font-size: 14px; color: var(--gray); margin-top: 10px;">Попробуйте: "Построй график sin(x)" или "Создай калькулятор"</p>
             </div>
           </div>
         </div>
@@ -56,11 +59,35 @@
     </div>
 
     <div class="status-bar">
-      <div id="status" class="status">Готов к работе</div>
+      <div id="status" class="status">✨ Готов к работе</div>
       <div id="execution-time" class="execution-time"></div>
+      <div class="stats">
+        <span title="Версия Pyodide">🐍 0.25.0</span>
+        <span title="Поддерживаемые библиотеки">📚 NumPy, Matplotlib, Pandas</span>
+      </div>
     </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <p>🚀 © 2025 CodeCanvas</p>
+        <div class="footer-features">
+          <span class="feature-tag">🤖 AI Powered</span>
+          <span class="feature-tag">🐍 Python in Browser</span>
+          <span class="feature-tag">📊 Data Visualization</span>
+          <span class="feature-tag">🎨 Interactive Apps</span>
+        </div>
+        <div class="footer-links">
+          <a href="#" class="footer-link">📚 Документация</a>
+          <a href="#" class="footer-link">🐙 GitHub</a>
+          <a href="#" class="footer-link">💬 Поддержка</a>
+        </div>
+      </div>
+    </footer>
   </div>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
   <script type="module" src="app.js"></script>
 </body>
